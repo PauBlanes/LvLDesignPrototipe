@@ -21,20 +21,29 @@ public class PlayerController : MonoBehaviour {
 		//Move player
 		transform.Translate (direction * speed * Time.deltaTime);
 
-		if (Input.GetKey (KeyCode.RightArrow) && tT == turnType.right) {
-			direction = new Vector3 (1, 0, 0);
-		}
-        if (Input.GetKey(KeyCode.LeftArrow) && tT == turnType.left)
-        {
-            direction = new Vector3(-1, 0, 0);
+		if (Input.GetKeyDown (KeyCode.RightArrow) && tT == turnType.right) {
+			//direction = new Vector3 (1, 0, 0);
+            transform.eulerAngles = new Vector3(0, 0, -90);
         }
-        if (Input.GetKey(KeyCode.UpArrow) && tT == turnType.up)
+        if (Input.GetKeyDown (KeyCode.LeftArrow) && tT == turnType.left)
         {
-            direction = new Vector3(0, 1, 0);
+            //direction = new Vector3(-1, 0, 0);
+            transform.eulerAngles = new Vector3(0, 0, 90);
         }
-        if (Input.GetKey(KeyCode.DownArrow) && tT == turnType.down)
+        if (Input.GetKeyDown (KeyCode.UpArrow) && tT == turnType.up)
         {
-            direction = new Vector3(0, -1, 0);
+           // direction = new Vector3(0, 1, 0);
+            transform.eulerAngles = new Vector3(0, 0, 0);
+        }
+        if (Input.GetKeyDown (KeyCode.DownArrow) && tT == turnType.down)
+        {
+            //direction = new Vector3(0, -1, 0);
+            transform.eulerAngles = new Vector3(0, 0, 180);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            transform.position += direction*4;
         }
     }
 

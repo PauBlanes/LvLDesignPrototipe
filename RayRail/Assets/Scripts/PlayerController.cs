@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour {
     List<Vector3> oldDirections = new List<Vector3>();
     bool backwards;
 
+    public bool canTp;
+
     // Use this for initialization
     void Start () {
 		
@@ -57,21 +59,23 @@ public class PlayerController : MonoBehaviour {
             
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && !backwards)
+        if (Input.GetKeyDown(KeyCode.Space) && !backwards && canTp)
         {
             Vector3 dir = new Vector3();
-            if (transform.eulerAngles.z == 0)
+            if (transform.eulerAngles.z == 0 || transform.eulerAngles.z == 360)
                 dir = new Vector3(0, 1, 0);
-            if (transform.eulerAngles.z == 180)
+            if (transform.eulerAngles.z == 180 ||transform.eulerAngles.z == -180)
                 dir = new Vector3(0, -1, 0);
-            if (transform.eulerAngles.z == 90)
+            if (transform.eulerAngles.z == 90 || transform.eulerAngles.z == -270)
                 dir = new Vector3(-1, 0, 0);
-            if (transform.eulerAngles.z == 270)
+            if (transform.eulerAngles.z == 270 || transform.eulerAngles.z == -90)
             {                
                 dir = new Vector3(1, 0, 0);
             }
 
             transform.position += dir*5;
+
+            canTp = false;
         }
         
     }
@@ -140,7 +144,7 @@ public class PlayerController : MonoBehaviour {
         yield return new WaitForSeconds(1f);
         transform.eulerAngles -= new Vector3(0, 0, 180);        
         backwards = false;
-        speed = 5;
+        speed = 4;
        
     }
 }

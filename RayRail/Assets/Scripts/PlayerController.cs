@@ -6,12 +6,16 @@ public class PlayerController : MonoBehaviour {
 
 	public Vector3 direction;
 	public float speed;
-
+    
 	enum turnType {none, right, left, up, down};
 	private turnType tT = turnType.none;
 
-	// Use this for initialization
-	void Start () {
+    //To go backwards
+    List<Vector3> oldDirections = new List<Vector3>();
+    bool backwards;
+
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
@@ -22,45 +26,105 @@ public class PlayerController : MonoBehaviour {
 		transform.Translate (direction * speed * Time.deltaTime);
 
 		if (Input.GetKeyDown (KeyCode.RightArrow) && tT == turnType.right) {
-			//direction = new Vector3 (1, 0, 0);
-            transform.eulerAngles = new Vector3(0, 0, -90);
+            //direction = new Vector3 (1, 0, 0);           
+            oldDirections.Add(transform.eulerAngles - new Vector3(0,0,180));
+            if (!backwards)
+                transform.eulerAngles = new Vector3(0, 0, -90);
+            
         }
         if (Input.GetKeyDown (KeyCode.LeftArrow) && tT == turnType.left)
         {
             //direction = new Vector3(-1, 0, 0);
-            transform.eulerAngles = new Vector3(0, 0, 90);
+            oldDirections.Add(transform.eulerAngles - new Vector3(0, 0, 180));
+            if (!backwards)
+                transform.eulerAngles = new Vector3(0, 0, 90);
+            
         }
         if (Input.GetKeyDown (KeyCode.UpArrow) && tT == turnType.up)
         {
-           // direction = new Vector3(0, 1, 0);
-            transform.eulerAngles = new Vector3(0, 0, 0);
+            // direction = new Vector3(0, 1, 0);
+            oldDirections.Add(transform.eulerAngles - new Vector3(0, 0, 180));
+            if (!backwards)
+                transform.eulerAngles = new Vector3(0, 0, 0);
+           
         }
         if (Input.GetKeyDown (KeyCode.DownArrow) && tT == turnType.down)
         {
             //direction = new Vector3(0, -1, 0);
-            transform.eulerAngles = new Vector3(0, 0, 180);
+            oldDirections.Add(transform.eulerAngles - new Vector3(0, 0, 180));
+            if (!backwards)
+                transform.eulerAngles = new Vector3(0, 0, 180);
+            
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !backwards)
         {
-            transform.position += direction*4;
+            Vector3 dir = new Vector3();
+            if (transform.eulerAngles.z == 0)
+                dir = new Vector3(0, 1, 0);
+            if (transform.eulerAngles.z == 180)
+                dir = new Vector3(0, -1, 0);
+            if (transform.eulerAngles.z == 90)
+                dir = new Vector3(-1, 0, 0);
+            if (transform.eulerAngles.z == 270)
+            {                
+                dir = new Vector3(1, 0, 0);
+            }
+
+            transform.position += dir*5;
         }
+        
     }
 
 	void OnTriggerEnter2D (Collider2D turnColl) {
 		switch (turnColl.tag) {
 		    case "turnRight":
-	            tT = turnType.right;
+                if (backwards)
+                {
+                    transform.eulerAngles = oldDirections[oldDirections.Count - 1];
+                    oldDirections.RemoveAt(oldDirections.Count - 1);
+                }
+                else
+	                tT = turnType.right;
 			    break;
             case "turnUp":
-                  tT = turnType.up;                
+                if (backwards)
+                {
+                    transform.eulerAngles = oldDirections[oldDirections.Count - 1];
+                    oldDirections.RemoveAt(oldDirections.Count - 1);
+                }
+                else
+                    tT = turnType.up;                
                   break;
             case "turnDown":
-                 tT = turnType.down;
+                if (backwards)
+                {
+                    transform.eulerAngles = oldDirections[oldDirections.Count - 1];
+                    oldDirections.RemoveAt(oldDirections.Count - 1);
+                }
+                else
+                    tT = turnType.down;
                  break;
             case "turnLeft":
-                 tT = turnType.left;
+                if (backwards)
+                {
+                    transform.eulerAngles = oldDirections[oldDirections.Count - 1];
+                    oldDirections.RemoveAt(oldDirections.Count - 1);
+                }
+                else
+                    tT = turnType.left;
                  break;
+            case "bounce":
+                if (!backwards)
+                {
+                    transform.eulerAngles -= new Vector3(0, 0, 180);
+                    backwards = true;
+                }                
+                break;
+            case "checkpoint":
+                if (backwards)
+                    StartCoroutine(Restart());
+                break;
             default:
 			    break;
 		}
@@ -69,4 +133,14 @@ public class PlayerController : MonoBehaviour {
 	void OnTriggerExit2D() {
 		tT = turnType.none;
 	}
+
+    IEnumerator Restart ()
+    {
+        speed = 0;
+        yield return new WaitForSeconds(1f);
+        transform.eulerAngles -= new Vector3(0, 0, 180);        
+        backwards = false;
+        speed = 5;
+       
+    }
 }

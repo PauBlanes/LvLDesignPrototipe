@@ -8,6 +8,8 @@ TagManager:
   - turnUp
   - turnDown
   - turnLeft
+  - bounce
+  - checkpoint
   layers:
   - Default
   - TransparentFX

@@ -11,6 +11,11 @@ TagManager:
   - bounce
   - checkpoint
   - coin
+  - win
+  - up-right
+  - up-left
+  - down-right
+  - down-left
   layers:
   - Default
   - TransparentFX

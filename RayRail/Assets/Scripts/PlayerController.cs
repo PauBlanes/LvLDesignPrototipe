@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 
@@ -12,13 +13,17 @@ public class PlayerController : MonoBehaviour {
 
     //To go backwards
     List<Vector3> oldDirections = new List<Vector3>();
-    bool backwards;
+    public bool backwards;
 
     public bool canTp;
+	public bool special;
+
+	int coinCount;
+	public Text coinText;
 
     // Use this for initialization
     void Start () {
-		
+		SetCountText ();
 	}
 	
 	// Update is called once per frame
@@ -29,7 +34,8 @@ public class PlayerController : MonoBehaviour {
 
 		if (Input.GetKeyDown (KeyCode.RightArrow) && tT == turnType.right) {
             //direction = new Vector3 (1, 0, 0);           
-            oldDirections.Add(transform.eulerAngles - new Vector3(0,0,180));
+			/*if (!special)
+				oldDirections.Add(transform.eulerAngles - new Vector3(0,0,180));*/
             if (!backwards)
                 transform.eulerAngles = new Vector3(0, 0, -90);
             
@@ -37,7 +43,8 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKeyDown (KeyCode.LeftArrow) && tT == turnType.left)
         {
             //direction = new Vector3(-1, 0, 0);
-            oldDirections.Add(transform.eulerAngles - new Vector3(0, 0, 180));
+			/*if (!special)
+				oldDirections.Add(transform.eulerAngles - new Vector3(0, 0, 180));*/
             if (!backwards)
                 transform.eulerAngles = new Vector3(0, 0, 90);
             
@@ -45,7 +52,8 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKeyDown (KeyCode.UpArrow) && tT == turnType.up)
         {
             // direction = new Vector3(0, 1, 0);
-            oldDirections.Add(transform.eulerAngles - new Vector3(0, 0, 180));
+			/*if (!special)
+				oldDirections.Add(transform.eulerAngles - new Vector3(0, 0, 180));*/
             if (!backwards)
                 transform.eulerAngles = new Vector3(0, 0, 0);
            
@@ -53,7 +61,8 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKeyDown (KeyCode.DownArrow) && tT == turnType.down)
         {
             //direction = new Vector3(0, -1, 0);
-            oldDirections.Add(transform.eulerAngles - new Vector3(0, 0, 180));
+			/*if (!special)
+				oldDirections.Add(transform.eulerAngles - new Vector3(0, 0, 180));*/
             if (!backwards)
                 transform.eulerAngles = new Vector3(0, 0, 180);
             
@@ -81,61 +90,70 @@ public class PlayerController : MonoBehaviour {
     }
 
 	void OnTriggerEnter2D (Collider2D turnColl) {
-		switch (turnColl.tag) {
-		    case "turnRight":
-                if (backwards)
-                {
-                    transform.eulerAngles = oldDirections[oldDirections.Count - 1];
-                    oldDirections.RemoveAt(oldDirections.Count - 1);
-                }
-                else
-	                tT = turnType.right;
-			    break;
-            case "turnUp":
-                if (backwards)
-                {
-                    transform.eulerAngles = oldDirections[oldDirections.Count - 1];
-                    oldDirections.RemoveAt(oldDirections.Count - 1);
-                }
-                else
-                    tT = turnType.up;                
-                  break;
-            case "turnDown":
-                if (backwards)
-                {
-                    transform.eulerAngles = oldDirections[oldDirections.Count - 1];
-                    oldDirections.RemoveAt(oldDirections.Count - 1);
-                }
-                else
-                    tT = turnType.down;
-                 break;
-            case "turnLeft":
-                if (backwards)
-                {
-                    transform.eulerAngles = oldDirections[oldDirections.Count - 1];
-                    oldDirections.RemoveAt(oldDirections.Count - 1);
-                }
-                else
-                    tT = turnType.left;
-                 break;
-            case "bounce":
-                if (!backwards)
-                {
-                    transform.eulerAngles -= new Vector3(0, 0, 180);
-                    backwards = true;
-                }                
-                break;
-            case "checkpoint":
-                if (backwards)
-                    StartCoroutine(Restart());
-                break;
-            default:
-			    break;
-		}
 
+
+			switch (turnColl.tag) {
+			case "turnRight":
+				/*if (backwards)
+				{
+					transform.eulerAngles = oldDirections[oldDirections.Count - 1];
+					oldDirections.RemoveAt(oldDirections.Count - 1);
+				}
+				else*/
+					tT = turnType.right;
+				break;
+			case "turnUp":				
+				/*if (backwards)
+				{
+					transform.eulerAngles = oldDirections[oldDirections.Count - 1];
+					oldDirections.RemoveAt(oldDirections.Count - 1);
+				}
+				else*/
+					tT = turnType.up;                
+				break;
+			case "turnDown":
+				/*if (backwards)
+				{
+					transform.eulerAngles = oldDirections[oldDirections.Count - 1];
+					oldDirections.RemoveAt(oldDirections.Count - 1);
+				}
+				else*/
+					tT = turnType.down;
+				break;
+			case "turnLeft":
+				/*if (backwards)
+				{
+					transform.eulerAngles = oldDirections[oldDirections.Count - 1];
+					oldDirections.RemoveAt(oldDirections.Count - 1);
+				}
+				else*/
+					tT = turnType.left;
+				break;
+			case "bounce":
+				if (!backwards)
+				{
+					transform.eulerAngles -= new Vector3(0, 0, 180);
+					backwards = true;
+				}                
+				break;
+			case "checkpoint":
+				if (backwards)
+					StartCoroutine(Restart());
+				break;
+			case "coin":
+				coinCount++;
+				SetCountText ();
+				Destroy (turnColl.gameObject);
+				break;
+			
+			default:
+				break;
+			}
 	}
 	void OnTriggerExit2D() {
 		tT = turnType.none;
+		if (special)
+			special = false;
 	}
 
     IEnumerator Restart ()
@@ -147,4 +165,8 @@ public class PlayerController : MonoBehaviour {
         speed = 4;
        
     }
+
+	void SetCountText () {
+		coinText.text = "X " + coinCount.ToString ();
+	}
 }
